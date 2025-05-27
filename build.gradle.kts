@@ -2,7 +2,7 @@ group = "swot"
 version = "0.1"
 
 plugins {
-    kotlin("jvm") version "2.0.20" apply true
+    alias(libs.plugins.kotlin.jvm) apply true
 
     id("application")
 }
