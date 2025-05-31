@@ -16,8 +16,9 @@ private object Resources {
     val stoplist = readList("/stoplist.txt") ?: error("Cannot find /stoplist.txt")
 
     fun readList(resource: String): Set<String>? {
-        val path = Resources::class.java.getResourceAsStream("/lib/domains/$resource") ?: return null
-        return path.bufferedReader().lineSequence().toHashSet()
+        val inputStream = Resources::class.java.getResourceAsStream("/lib/domains$resource") ?: return null
+
+        return inputStream.bufferedReader().lineSequence().toHashSet()
     }
 }
 
