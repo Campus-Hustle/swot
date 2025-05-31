@@ -17,13 +17,31 @@ private object Resources {
     val tlds = readList("/tlds.txt") ?: error("Cannot find /tlds.txt")
     val stoplist = readList("/stoplist.txt") ?: error("Cannot find /stoplist.txt")
 
-    fun readList(resource: String): Set<String>? =
-        File("jetbrains-swot/lib/domains/$resource")
-            .takeIf {
-                it.exists()
-            }?.bufferedReader()
-            ?.lineSequence()
-            ?.toHashSet()
+    fun readList(resource: String): Set<String>? {
+        // Try multiple paths to find the resource
+        val paths = listOf(
+            "lib/domains$resource",
+            "jetbrains-swot/lib/domains$resource",
+            "../jetbrains-swot/lib/domains$resource",
+            "../../jetbrains-swot/lib/domains$resource",
+            "../../../jetbrains-swot/lib/domains$resource"
+        )
+
+        for (path in paths) {
+            val file = File(path)
+            if (file.exists()) {
+                return file.bufferedReader().lineSequence().toHashSet()
+            }
+        }
+
+        // Try classpath as a last resort
+        val classpathResource = Resources::class.java.getResourceAsStream("/domains$resource")
+        if (classpathResource != null) {
+            return classpathResource.bufferedReader().lineSequence().toHashSet()
+        }
+
+        return null
+    }
 }
 
 private fun findSchoolNames(parts: List<String>): List<String> {
