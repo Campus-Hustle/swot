@@ -20,29 +20,46 @@ application {
     mainClass.set("swot.CompilerKt")
 }
 
-val copyLibToResources by tasks.registering(Copy::class) {
-    from("lib")
-    into("src/main/resources/lib")
-
-    doFirst {
-        val dest = file("src/main/resources/lib")
-        if (dest.exists() && dest.listFiles()?.isNotEmpty() == true) {
-            logger.lifecycle("[copyLibToResources] Destination already exists and is not empty, skipping copy.")
-            enabled = false
-        } else {
-            logger.lifecycle("[copyLibToResources] Copying lib/ to resources/lib/...")
-        }
-    }
-}
-
-tasks.named("processResources") {
-    dependsOn(copyLibToResources)
-}
-
 tasks.withType<Test> {
     useJUnit()
 
     testLogging {
         events("passed", "skipped", "failed")
+    }
+}
+
+tasks.register<CopyLibToResources>("copyLibToResources") {
+    val projectDir = layout.projectDirectory
+
+    source = projectDir.dir("lib")
+    destination = projectDir.dir("src/main/resources/lib")
+
+    onlyIf {
+        // Only copy if the destination directory does not already contain files
+        val destDir = destination.get().asFile
+        !destDir.exists() || destDir.listFiles()?.isEmpty() == true
+    }
+}
+
+tasks.named("processResources") {
+    dependsOn("copyLibToResources")
+}
+
+abstract class CopyLibToResources : DefaultTask() {
+    @get:InputDirectory
+    abstract val source: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val destination: DirectoryProperty
+
+    @get:Inject
+    abstract val fs: FileSystemOperations
+
+    @TaskAction
+    fun action() {
+        fs.copy {
+            from(source)
+            into(destination)
+        }
     }
 }
