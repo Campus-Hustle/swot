@@ -18,7 +18,7 @@ private object Resources {
     val stoplist = readList("/stoplist.txt") ?: error("Cannot find /stoplist.txt")
 
     fun readList(resource: String): Set<String>? =
-        File("swot/lib/domains/$resource")
+        File("jetbrains-swot/lib/domains/$resource")
             .takeIf {
                 it.exists()
             }?.bufferedReader()
