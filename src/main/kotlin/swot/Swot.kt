@@ -1,7 +1,5 @@
 package swot
 
-import java.io.File
-
 fun isAcademic(email: String): Boolean {
     val parts = domainParts(email)
     return !isStoplisted(parts) && (isUnderTLD(parts) || findSchoolNames(parts).isNotEmpty())
@@ -17,13 +15,14 @@ private object Resources {
     val tlds = readList("/tlds.txt") ?: error("Cannot find /tlds.txt")
     val stoplist = readList("/stoplist.txt") ?: error("Cannot find /stoplist.txt")
 
-    fun readList(resource: String): Set<String>? =
-        File("jetbrains-swot/lib/domains/$resource")
-            .takeIf {
-                it.exists()
-            }?.bufferedReader()
-            ?.lineSequence()
-            ?.toHashSet()
+    fun readList(resource: String): Set<String>? {
+        val stream = Resources::class.java.getResourceAsStream("/lib/domains$resource")
+        if (stream == null) return null
+        return stream
+            .bufferedReader()
+            .lineSequence()
+            .toHashSet()
+    }
 }
 
 private fun findSchoolNames(parts: List<String>): List<String> {
