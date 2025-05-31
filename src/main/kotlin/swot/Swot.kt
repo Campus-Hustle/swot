@@ -19,13 +19,14 @@ private object Resources {
 
     fun readList(resource: String): Set<String>? {
         // Try multiple paths to find the resource
-        val paths = listOf(
-            "lib/domains$resource",
-            "jetbrains-swot/lib/domains$resource",
-            "../jetbrains-swot/lib/domains$resource",
-            "../../jetbrains-swot/lib/domains$resource",
-            "../../../jetbrains-swot/lib/domains$resource"
-        )
+        val paths =
+            listOf(
+                "lib/domains$resource",
+                "jetbrains-swot/lib/domains$resource",
+                "../jetbrains-swot/lib/domains$resource",
+                "../../jetbrains-swot/lib/domains$resource",
+                "../../../jetbrains-swot/lib/domains$resource",
+            )
 
         for (path in paths) {
             val file = File(path)
